@@ -1,17 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.api.deps import current_user
+from app.api.deps import require_role
 from app.core.config import settings
 from app.db.session import get_db
-from app.models import Tenant, User
+from app.models import Role, Tenant, User
 from app.services.billing import price_id_for_plan
 
 router = APIRouter()
 
 
 @router.post("/checkout")
-def create_checkout_session(plan: str, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, str]:
+def create_checkout_session(plan: str, user: User = Depends(require_role(Role.OWNER, Role.ADMIN)), db: Session = Depends(get_db)) -> dict[str, str]:
     if not settings.stripe_secret_key:
         raise HTTPException(status_code=503, detail="Stripe is not configured")
     import stripe
@@ -35,7 +35,7 @@ def create_checkout_session(plan: str, user: User = Depends(current_user), db: S
 
 
 @router.post("/portal")
-def create_portal_session(user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, str]:
+def create_portal_session(user: User = Depends(require_role(Role.OWNER, Role.ADMIN)), db: Session = Depends(get_db)) -> dict[str, str]:
     if not settings.stripe_secret_key:
         raise HTTPException(status_code=503, detail="Stripe is not configured")
     import stripe
@@ -46,4 +46,3 @@ def create_portal_session(user: User = Depends(current_user), db: Session = Depe
         raise HTTPException(status_code=400, detail="Stripe customer is not connected")
     session = stripe.billing_portal.Session.create(customer=tenant.stripe_customer_id, return_url=f"{settings.web_base_url}/dashboard")
     return {"url": session.url}
-

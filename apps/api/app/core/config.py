@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 720
     cookie_secure: bool = False
     cors_origins: str = "http://localhost:3000"
+    trusted_hosts: str = "localhost,127.0.0.1,api.localhost"
     web_base_url: str = "http://localhost:3000"
     grants_gov_search_url: str = "https://api.grants.gov/v1/api/search2"
     grants_gov_fetch_limit: int = 50
@@ -32,11 +33,29 @@ class Settings(BaseSettings):
     resend_api_key: str | None = None
     email_from: str = "GrantAtlas <notifications@example.com>"
     bootstrap_admin_email: str = "owner@gratitech.org"
-    bootstrap_admin_password: str = "ChangeMe123!"
+    bootstrap_admin_password: str = "local-dev-change-me-only"
+
+    @model_validator(mode="after")
+    def production_secrets_must_be_changed(self) -> "Settings":
+        if self.environment.lower() == "production":
+            weak_values = {
+                "dev-only-change-me",
+                "change-this-to-a-long-random-secret",
+                "local-dev-change-me-only",
+            }
+            if self.secret_key in weak_values:
+                raise ValueError("SECRET_KEY must be changed before running in production")
+            if self.bootstrap_admin_password in weak_values:
+                raise ValueError("BOOTSTRAP_ADMIN_PASSWORD must be changed before running in production")
+        return self
 
     @property
     def cors_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+    @property
+    def trusted_host_list(self) -> list[str]:
+        return [host.strip() for host in self.trusted_hosts.split(",") if host.strip()]
 
 
 @lru_cache

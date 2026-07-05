@@ -32,14 +32,15 @@ docker compose exec api python -m app.db.seed
 
 - Hetzner hardening with root SSH keys: [docs/hetzner-hardening-root-ssh.md](docs/hetzner-hardening-root-ssh.md)
 - Production deployment: [docs/production-deployment.md](docs/production-deployment.md)
+- OWASP security review: [docs/owasp-security-review.md](docs/owasp-security-review.md)
 - General deployment notes: [docs/deployment.md](docs/deployment.md)
 
 Default seeded account:
 
 - Email: `owner@gratitech.org`
-- Password: `ChangeMe123!`
+- Password: the value of `BOOTSTRAP_ADMIN_PASSWORD` in your local `.env`
 
-Change the seeded password immediately outside local development.
+Change the seeded password before any shared or production deployment.
 
 ## MVP Scope
 

@@ -21,9 +21,10 @@ Recommended starter server:
 - Install Docker Engine and Docker Compose plugin from Docker's official repository.
 - Configure Hetzner Cloud Firewall for SSH, HTTP, and HTTPS only.
 - Rotate `.env` secrets before first production launch.
+- Set `POSTGRES_PASSWORD`, `DATABASE_URL`, `SECRET_KEY`, and `BOOTSTRAP_ADMIN_PASSWORD` to unique production values.
 - Use a real hostname in `PUBLIC_HOSTNAME` and `PUBLIC_SITE_URL`.
 - Point DNS `A` records for `grantatlas.ai`, `www.grantatlas.ai`, `app.grantatlas.ai`, and `api.grantatlas.ai` at the Hetzner server before starting Caddy.
-- Keep database, Redis, and MinIO ports private to the Docker network.
+- Keep database and Redis private to the Docker network. MinIO console, API, and web ports bind to `127.0.0.1` by default; only Caddy publishes public HTTP/HTTPS.
 - Schedule encrypted off-server backups.
 - Monitor disk usage, container restarts, and Caddy certificate renewal logs.
 
@@ -38,7 +39,9 @@ cp .env.production.example .env
 Edit `.env`:
 
 - `SECRET_KEY`
+- `POSTGRES_PASSWORD`
 - `DATABASE_URL`
+- `BOOTSTRAP_ADMIN_PASSWORD`
 - `MINIO_SECRET_KEY`
 - `PUBLIC_HOSTNAME`
 - `APP_HOSTNAME`
@@ -48,6 +51,8 @@ Edit `.env`:
 - `CADDY_ACME_EMAIL`
 - Stripe keys and price IDs
 - Resend API key and verified sender
+
+The production compose profile publishes only Caddy on public ports `80` and `443`. Direct API, web, and MinIO console ports are bound to localhost for operator access and reverse-proxy use.
 
 Start production profile:
 

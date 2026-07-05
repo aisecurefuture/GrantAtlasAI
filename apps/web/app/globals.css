@@ -163,6 +163,7 @@ h3 {
   border-radius: 8px;
   box-shadow: var(--shadow);
   padding: 18px;
+  overflow-x: auto;
 }
 
 .metric {
@@ -218,6 +219,7 @@ h3 {
 
 .table {
   width: 100%;
+  min-width: 680px;
   border-collapse: collapse;
 }
 
@@ -599,5 +601,89 @@ h3 {
 
   .hero-product {
     min-width: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .main {
+    padding: 16px;
+  }
+
+  .topbar,
+  .section-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .button,
+  .input,
+  .select,
+  .textarea {
+    width: 100%;
+  }
+
+  .toolbar,
+  .hero-actions {
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .marketing-nav,
+  .marketing-section,
+  .marketing-band,
+  .marketing-footer {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .marketing-nav nav {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .marketing-hero {
+    padding: 24px 18px 52px;
+    gap: 28px;
+  }
+
+  .hero-copy h1 {
+    font-size: 34px;
+    line-height: 1.08;
+  }
+
+  .hero-copy p {
+    font-size: 16px;
+  }
+
+  .hero-product {
+    padding: 12px;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pipeline-row {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .section-title h2,
+  .marketing-band h2 {
+    font-size: 28px;
+  }
+
+  .feature-card,
+  .pricing-card {
+    min-height: auto;
+  }
+
+  .login-page {
+    align-items: start;
+    padding-top: 56px;
+  }
+
+  .login-panel {
+    padding: 22px;
   }
 }

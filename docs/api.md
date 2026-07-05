@@ -9,7 +9,7 @@ The API is served by FastAPI. OpenAPI docs are available at `/docs` in non-restr
 ```json
 {
   "email": "owner@gratitech.org",
-  "password": "ChangeMe123!"
+  "password": "<BOOTSTRAP_ADMIN_PASSWORD>"
 }
 ```
 

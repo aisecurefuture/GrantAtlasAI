@@ -22,6 +22,7 @@ Replace at minimum:
 
 ```env
 SECRET_KEY=long-random-production-secret
+POSTGRES_PASSWORD=strong-db-password
 DATABASE_URL=postgresql+psycopg://grantatlas:strong-db-password@db:5432/grantatlas
 MINIO_SECRET_KEY=strong-minio-secret
 BOOTSTRAP_ADMIN_PASSWORD=strong-bootstrap-password
@@ -52,8 +53,11 @@ WEB_BASE_URL=https://app.grantatlas.ai
 API_BASE_URL=https://api.grantatlas.ai
 NEXT_PUBLIC_APP_URL=https://app.grantatlas.ai
 CORS_ORIGINS=https://grantatlas.ai,https://app.grantatlas.ai
+TRUSTED_HOSTS=api.grantatlas.ai,grantatlas.ai,app.grantatlas.ai
 COOKIE_SECURE=true
 ```
+
+The API, web, and MinIO console compose ports are bound to `127.0.0.1`. Caddy is the only service intended to publish public HTTP/HTTPS traffic.
 
 ## Deploy
 
@@ -127,4 +131,3 @@ docker compose logs --tail=100 web
 docker compose logs --tail=100 worker
 docker compose logs --tail=100 caddy
 ```
-

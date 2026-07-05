@@ -9,8 +9,8 @@ export default function LoginPage() {
           <BrandLogo />
           <h1>Sign in</h1>
         </div>
-        <input className="input" type="email" defaultValue="owner@gratitech.org" aria-label="Email" />
-        <input className="input" type="password" defaultValue="ChangeMe123!" aria-label="Password" />
+        <input className="input" type="email" placeholder="owner@example.com" aria-label="Email" autoComplete="email" />
+        <input className="input" type="password" placeholder="Password" aria-label="Password" autoComplete="current-password" />
         <button className="button" type="submit">
           <LogIn size={18} />
           Continue

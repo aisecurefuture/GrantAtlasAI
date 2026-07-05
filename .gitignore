@@ -1,0 +1,17 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+node_modules/
+.next/
+dist/
+coverage/
+*.log
+uploads/
+postgres-data/
+redis-data/
+minio-data/

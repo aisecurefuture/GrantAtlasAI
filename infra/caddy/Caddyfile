@@ -1,0 +1,53 @@
+{
+	email {$CADDY_ACME_EMAIL}
+}
+
+www.{$PUBLIC_HOSTNAME} {
+	encode gzip zstd
+	redir https://{$PUBLIC_HOSTNAME}{uri} permanent
+}
+
+{$PUBLIC_HOSTNAME} {
+	encode gzip zstd
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+
+	reverse_proxy web:3000
+}
+
+{$APP_HOSTNAME} {
+	encode gzip zstd
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+
+	@root path /
+	redir @root /dashboard
+
+	reverse_proxy web:3000
+}
+
+{$API_HOSTNAME} {
+	encode gzip zstd
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+
+	reverse_proxy api:8000
+}

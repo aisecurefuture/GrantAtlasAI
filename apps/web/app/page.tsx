@@ -14,6 +14,49 @@ import {
 
 export default function Home() {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.grantatlas.ai";
+  const pricing = [
+    {
+      plan: "Starter",
+      price: "$149",
+      period: "/mo",
+      annual: "$119/mo paid annually",
+      description: "For small nonprofits getting grant discovery and deadlines under control.",
+      details: "2 users, Grants.gov and SAM.gov discovery, fit scoring, pipeline tracking",
+      cta: "Start trial",
+      href: `${appUrl}/login`,
+    },
+    {
+      plan: "Professional",
+      price: "$349",
+      period: "/mo",
+      annual: "$279/mo paid annually",
+      description: "For active grant teams managing proposals, reviews, and reusable content.",
+      details: "5 users, proposal workspaces, content library, capture plans, team collaboration",
+      cta: "Start trial",
+      href: `${appUrl}/login`,
+      featured: true,
+    },
+    {
+      plan: "Growth",
+      price: "$749",
+      period: "/mo",
+      annual: "$599/mo paid annually",
+      description: "For larger teams pursuing grants and government contracts together.",
+      details: "15 users, partner CRM, past performance records, advanced reporting, priority support",
+      cta: "Start trial",
+      href: `${appUrl}/login`,
+    },
+    {
+      plan: "Enterprise",
+      price: "Custom",
+      period: "",
+      annual: "Starts around $1,500/mo annual",
+      description: "For universities, municipalities, and multi-team funding operations.",
+      details: "Custom users, security review support, SSO/API roadmap, dedicated onboarding",
+      cta: "Contact sales",
+      href: "mailto:sales@grantatlas.ai",
+    },
+  ];
   const pipeline = [
     { name: "NSF CyberCorps Scholarship Support", type: "Federal grant", score: 91, action: "Apply" },
     { name: "Community AI Literacy Capacity Fund", type: "Foundation", score: 86, action: "Apply" },
@@ -140,16 +183,23 @@ export default function Home() {
           <h2>Launch with a 14-day trial, then grow by team size and workflow depth.</h2>
         </div>
         <div className="pricing-grid">
-          {[
-            ["Starter", "Single-organization grant tracking", "$49"],
-            ["Professional", "Collaboration, workspaces, and exports", "$149"],
-            ["Growth", "Advanced scoring and larger teams", "$399"],
-            ["Enterprise", "SSO-ready architecture and API access", "Custom"],
-          ].map(([plan, description, price]) => (
-            <article className="pricing-card" key={plan}>
-              <h3>{plan}</h3>
-              <strong>{price}</strong>
-              <p>{description}</p>
+          {pricing.map((tier) => (
+            <article className="pricing-card" data-featured={tier.featured ? "true" : "false"} key={tier.plan}>
+              <div className="pricing-card-head">
+                <h3>{tier.plan}</h3>
+                {tier.featured ? <span className="pill high">Most popular</span> : null}
+              </div>
+              <div className="price-line">
+                <strong>{tier.price}</strong>
+                <span>{tier.period}</span>
+              </div>
+              <span className="billing-note">{tier.annual}</span>
+              <p>{tier.description}</p>
+              <p className="pricing-detail">{tier.details}</p>
+              <a className={tier.featured ? "button" : "button secondary"} href={tier.href}>
+                {tier.cta}
+                <ArrowRight size={16} />
+              </a>
             </article>
           ))}
         </div>

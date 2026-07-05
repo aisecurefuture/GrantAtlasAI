@@ -7,6 +7,7 @@ Create Date: 2026-07-04 20:40:00.000000
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 revision = "0001_initial"
 down_revision = None
@@ -14,9 +15,9 @@ branch_labels = None
 depends_on = None
 
 
-role = sa.Enum("OWNER", "ADMIN", "GRANT_WRITER", "REVIEWER", "VIEWER", name="role")
-opportunitystatus = sa.Enum("NEW", "MONITORING", "APPLIED", "SKIPPED", "REQUIRES_PARTNER", name="opportunitystatus")
-recommendedaction = sa.Enum("APPLY", "PARTNER", "MONITOR", "SKIP", name="recommendedaction")
+role = postgresql.ENUM("OWNER", "ADMIN", "GRANT_WRITER", "REVIEWER", "VIEWER", name="role", create_type=False)
+opportunitystatus = postgresql.ENUM("NEW", "MONITORING", "APPLIED", "SKIPPED", "REQUIRES_PARTNER", name="opportunitystatus", create_type=False)
+recommendedaction = postgresql.ENUM("APPLY", "PARTNER", "MONITOR", "SKIP", name="recommendedaction", create_type=False)
 
 
 def upgrade() -> None:
@@ -184,4 +185,3 @@ def downgrade() -> None:
     recommendedaction.drop(op.get_bind(), checkfirst=True)
     opportunitystatus.drop(op.get_bind(), checkfirst=True)
     role.drop(op.get_bind(), checkfirst=True)
-

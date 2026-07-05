@@ -7,6 +7,7 @@ Create Date: 2026-07-05 00:30:00.000000
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 revision = "0002_contracting_v2"
 down_revision = "0001_initial"
@@ -14,8 +15,8 @@ branch_labels = None
 depends_on = None
 
 
-capturestatus = sa.Enum("WATCHING", "QUALIFYING", "PURSUING", "PROPOSING", "SUBMITTED", "NO_BID", name="capturestatus")
-contractaction = sa.Enum("PURSUE", "TEAM", "WATCH", "NO_BID", name="contractaction")
+capturestatus = postgresql.ENUM("WATCHING", "QUALIFYING", "PURSUING", "PROPOSING", "SUBMITTED", "NO_BID", name="capturestatus", create_type=False)
+contractaction = postgresql.ENUM("PURSUE", "TEAM", "WATCH", "NO_BID", name="contractaction", create_type=False)
 
 
 def upgrade() -> None:
@@ -138,4 +139,3 @@ def downgrade() -> None:
         op.drop_table(table)
     contractaction.drop(op.get_bind(), checkfirst=True)
     capturestatus.drop(op.get_bind(), checkfirst=True)
-

@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  typedRoutes: true,
   async headers() {
     return [
       {
@@ -15,9 +16,6 @@ const nextConfig: NextConfig = {
       }
     ];
   },
-  experimental: {
-    typedRoutes: true
-  }
 };
 
 export default nextConfig;

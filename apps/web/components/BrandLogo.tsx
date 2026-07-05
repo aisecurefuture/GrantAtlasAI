@@ -1,7 +1,8 @@
 import Link from "next/link";
+import type { Route } from "next";
 
 type BrandLogoProps = {
-  href?: string;
+  href?: Route;
   label?: string;
   showWordmark?: boolean;
   tone?: "dark" | "light";
@@ -51,4 +52,3 @@ export function BrandLogo({ href, label = "GrantAtlas.ai", showWordmark = true, 
     </div>
   );
 }
-

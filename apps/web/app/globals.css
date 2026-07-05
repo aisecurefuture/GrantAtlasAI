@@ -69,6 +69,8 @@ textarea {
 .brand-logo-wordmark {
   display: inline-flex;
   align-items: baseline;
+  gap: 0;
+  white-space: nowrap;
   color: #102033;
 }
 

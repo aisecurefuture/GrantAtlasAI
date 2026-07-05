@@ -1,8 +1,7 @@
 import Link from "next/link";
-import type { Route } from "next";
 
 type BrandLogoProps = {
-  href?: Route;
+  href?: string;
   label?: string;
   showWordmark?: boolean;
   tone?: "dark" | "light";

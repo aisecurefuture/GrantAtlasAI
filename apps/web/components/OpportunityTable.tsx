@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { Route } from "next";
 import { CalendarDays } from "lucide-react";
 import type { Opportunity } from "@/lib/types";
 
@@ -29,7 +28,7 @@ export function OpportunityTable({ opportunities }: { opportunities: Opportunity
             return (
               <tr key={opportunity.id}>
                 <td>
-                  <Link href={`/opportunities/${opportunity.id}` as Route}>
+                  <Link href={`/opportunities/${opportunity.id}`}>
                     <strong>{opportunity.title}</strong>
                   </Link>
                   <div className="muted">{opportunity.agency}</div>

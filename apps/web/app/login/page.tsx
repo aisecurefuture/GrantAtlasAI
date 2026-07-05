@@ -6,7 +6,14 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+function apiBaseUrl() {
+  const configuredUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (configuredUrl) return configuredUrl;
+  if (typeof window !== "undefined" && window.location.hostname.endsWith("grantatlas.ai")) {
+    return "https://api.grantatlas.ai";
+  }
+  return "http://localhost:8000";
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,7 +28,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch(`${apiBaseUrl()}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

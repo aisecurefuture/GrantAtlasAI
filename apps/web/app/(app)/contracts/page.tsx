@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 import { BriefcaseBusiness, Filter, Search } from "lucide-react";
 import { fetchContracts } from "@/lib/api";
 
@@ -53,7 +54,7 @@ export default async function ContractsPage() {
             {contracts.map((contract) => (
               <tr key={contract.id}>
                 <td>
-                  <Link href={`/contracts/${contract.id}`}><strong>{contract.title}</strong></Link>
+                  <Link href={`/contracts/${contract.id}` as Route}><strong>{contract.title}</strong></Link>
                   <div className="muted">{contract.department}</div>
                 </td>
                 <td>{contract.naics_code ?? "TBD"}</td>
@@ -68,4 +69,3 @@ export default async function ContractsPage() {
     </div>
   );
 }
-

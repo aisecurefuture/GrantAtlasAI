@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { BookOpen, BriefcaseBusiness, Building2, Gauge, Handshake, Library, ShieldCheck, Target, Trophy } from "lucide-react";
+import type { Route } from "next";
+import { BookOpen, BriefcaseBusiness, Building2, Gauge, Handshake, Library, ShieldCheck, Target, Trophy, type LucideIcon } from "lucide-react";
 import { BrandLogo } from "./BrandLogo";
 
-const nav = [
+const nav: Array<{ href: Route; label: string; icon: LucideIcon }> = [
   { href: "/dashboard", label: "Dashboard", icon: Gauge },
   { href: "/opportunities/seed-tech-001", label: "Opportunities", icon: Target },
   { href: "/contracts", label: "Contracts", icon: BriefcaseBusiness },

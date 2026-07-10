@@ -61,6 +61,16 @@ services:
       - redis
     command: celery -A app.workers.celery_app worker --loglevel=INFO
 
+  beat:
+    build:
+      context: ./apps/api
+    env_file:
+      - ${COMPOSE_ENV_FILE:-.env}
+    depends_on:
+      - worker
+      - redis
+    command: celery -A app.workers.celery_app beat --loglevel=INFO
+
   web:
     build:
       context: ./apps/web
@@ -69,6 +79,7 @@ services:
     environment:
       NEXT_PUBLIC_API_BASE_URL: ${API_BASE_URL:-http://localhost:8000}
       NEXT_PUBLIC_APP_URL: ${WEB_BASE_URL:-http://localhost:3000}
+      API_SERVER_URL: ${API_SERVER_URL:-http://api:8000}
     depends_on:
       - api
     ports:

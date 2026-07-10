@@ -188,6 +188,20 @@ def run() -> None:
             if title not in existing_titles:
                 db.add(LibraryItem(tenant_id=tenant.id, title=title, category=category, body=body, tags=FOCUS_AREAS[:4]))
 
+        db.flush()
+
+        # Score any seeded records that don't have scores yet, so demo data
+        # shows the explainable fit scoring out of the box.
+        from app.models import ContractScore, OpportunityScore
+        from app.services.ingestion import store_contract_score, store_opportunity_score
+
+        for opportunity in db.query(Opportunity).filter(Opportunity.tenant_id == tenant.id).all():
+            if not db.query(OpportunityScore).filter(OpportunityScore.opportunity_id == opportunity.id).first():
+                store_opportunity_score(db, tenant.id, opportunity)
+        for contract_row in db.query(ContractOpportunity).filter(ContractOpportunity.tenant_id == tenant.id).all():
+            if not db.query(ContractScore).filter(ContractScore.contract_opportunity_id == contract_row.id).first():
+                store_contract_score(db, tenant.id, contract_row)
+
         db.commit()
     finally:
         db.close()

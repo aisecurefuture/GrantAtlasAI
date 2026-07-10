@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 720
     cookie_secure: bool = False
     cors_origins: str = "http://localhost:3000"
-    trusted_hosts: str = "localhost,127.0.0.1,api.localhost"
+    trusted_hosts: str = "localhost,127.0.0.1,api.localhost,api,testserver"
     web_base_url: str = "http://localhost:3000"
     grants_gov_search_url: str = "https://api.grants.gov/v1/api/search2"
     grants_gov_fetch_limit: int = 50
@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     stripe_growth_price_id: str | None = None
     stripe_enterprise_price_id: str | None = None
     stripe_trial_days: int = 14
+    anthropic_api_key: str | None = None
+    anthropic_model: str = "claude-opus-4-8"
     resend_api_key: str | None = None
     email_from: str = "GrantAtlas <notifications@example.com>"
     bootstrap_admin_email: str = "owner@gratitech.org"

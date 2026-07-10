@@ -20,8 +20,10 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
-  letter-spacing: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
 }
 
 a {
@@ -302,6 +304,237 @@ h3 {
 .stack {
   display: grid;
   gap: 12px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.form-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.form-success {
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.button.ghost {
+  background: transparent;
+  color: #cbd7e6;
+  border: 1px solid #2c405c;
+}
+
+.button.ghost:hover {
+  background: #21334d;
+  color: #ffffff;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  display: grid;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid #2c405c;
+}
+
+.account {
+  display: grid;
+  gap: 2px;
+}
+
+.account-name {
+  font-weight: 700;
+}
+
+.account-role {
+  font-size: 13px;
+  color: #8fa3bd;
+}
+
+.disclosure {
+  position: relative;
+}
+
+.disclosure-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: min(560px, 92vw);
+  z-index: 30;
+  display: grid;
+  gap: 12px;
+  box-shadow: 0 24px 60px rgba(24, 33, 47, 0.22);
+}
+
+.empty-state {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  padding: 32px;
+}
+
+.empty-state p {
+  margin: 0;
+  font-weight: 700;
+}
+
+.empty-state p.muted {
+  font-weight: 400;
+}
+
+.score-block {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.reasons {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.score-bars {
+  display: grid;
+  gap: 10px;
+}
+
+.score-bar-row {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 10px;
+}
+
+.score-bar-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.score-bar-track {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: #e8edf5;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--blue);
+}
+
+.score-bar-fill.high {
+  background: var(--green);
+}
+
+.score-bar-fill.medium {
+  background: var(--amber);
+}
+
+.score-bar-fill.low {
+  background: var(--red);
+}
+
+.score-bar-value {
+  font-weight: 800;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ai-narrative {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 8px;
+  background: #f2f7ff;
+  border: 1px solid #d5e3f8;
+}
+
+.ai-narrative p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.ai-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.notice {
+  border-left: 4px solid var(--amber);
+  display: grid;
+  gap: 4px;
+}
+
+.notice p {
+  margin: 0;
+}
+
+.proposal-card:hover {
+  border-color: var(--blue);
+}
+
+.skeleton,
+.skeleton-card,
+.skeleton-block {
+  border-radius: 8px;
+  background: linear-gradient(90deg, #e8edf5 25%, #f2f5fa 50%, #e8edf5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-title {
+  height: 38px;
+  width: min(320px, 60%);
+}
+
+.skeleton-card {
+  min-height: 116px;
+  border: 1px solid var(--line);
+}
+
+.skeleton-block {
+  min-height: 320px;
+  border: 1px solid var(--line);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .login-page {
@@ -641,6 +874,20 @@ h3 {
 
   .hero-product {
     min-width: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .score-bar-row {
+    grid-template-columns: 120px minmax(0, 1fr) 40px;
+  }
+
+  .disclosure-panel {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    top: 20vh;
+    width: auto;
   }
 }
 

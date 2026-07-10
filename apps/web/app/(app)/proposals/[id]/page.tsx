@@ -1,60 +1,92 @@
-export default function ProposalWorkspacePage() {
-  const columns = {
-    "To do": ["Confirm NOFO requirements", "Draft compliance matrix", "Collect IRS determination letter"],
-    Drafting: ["Mission fit narrative", "Program model", "Evaluation plan"],
-    Review: ["Budget narrative"],
-    Complete: ["Organization history"]
-  };
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { getProposal } from "@/lib/api";
+
+export const dynamic = "force-dynamic";
+
+const KANBAN_COLUMNS = ["Not started", "Drafting", "Review", "Complete"];
+
+function normalizeColumn(status: string | undefined): string {
+  if (!status) return "Not started";
+  const match = KANBAN_COLUMNS.find((c) => c.toLowerCase() === status.toLowerCase());
+  return match ?? "Not started";
+}
+
+export default async function ProposalWorkspacePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const proposal = await getProposal(id);
+
+  const outline = proposal.outline ?? [];
+  const columns: Record<string, string[]> = Object.fromEntries(KANBAN_COLUMNS.map((c) => [c, [] as string[]]));
+  for (const section of outline) {
+    columns[normalizeColumn(section.status)].push(section.heading);
+  }
 
   return (
     <div className="stack">
+      <Link className="toolbar muted" href="/proposals">
+        <ArrowLeft size={16} />
+        Back to proposals
+      </Link>
       <div className="topbar">
         <div>
           <p className="eyebrow">Proposal workspace</p>
-          <h1>Community Technology Education Capacity Grant</h1>
+          <h1>{proposal.title}</h1>
         </div>
-        <button className="button">Export</button>
       </div>
+
       <section className="grid cols-2">
         <div className="card stack">
           <h2>Proposal outline</h2>
-          {["Executive summary", "Need statement", "Program design", "Evaluation", "Sustainability", "Budget narrative"].map((item) => (
-            <p key={item}>{item}</p>
-          ))}
+          {outline.length === 0 ? (
+            <p className="muted">No outline sections yet.</p>
+          ) : (
+            outline.map((section) => (
+              <div className="toolbar" key={section.heading} style={{ justifyContent: "space-between" }}>
+                <span>{section.heading}</span>
+                <span className="pill">{section.status ?? "Not started"}</span>
+              </div>
+            ))
+          )}
         </div>
         <div className="card stack">
           <h2>Compliance matrix</h2>
-          <table className="table">
-            <tbody>
-              <tr>
-                <td>Eligibility</td>
-                <td><span className="pill high">Mapped</span></td>
-              </tr>
-              <tr>
-                <td>Attachments</td>
-                <td><span className="pill medium">Needs review</span></td>
-              </tr>
-              <tr>
-                <td>Budget</td>
-                <td><span className="pill">Draft</span></td>
-              </tr>
-            </tbody>
-          </table>
+          {proposal.compliance_matrix?.length ? (
+            <table className="table">
+              <tbody>
+                {proposal.compliance_matrix.map((row, index) => (
+                  <tr key={`${row.requirement}-${index}`}>
+                    <td>{row.requirement}</td>
+                    <td>{row.owner}</td>
+                    <td>
+                      <span className="pill">{row.status}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="muted">Compliance matrix is empty. Map each solicitation requirement to an owner and status.</p>
+          )}
         </div>
       </section>
+
       <section className="kanban">
-        {Object.entries(columns).map(([name, tasks]) => (
+        {KANBAN_COLUMNS.map((name) => (
           <div className="kanban-column stack" key={name}>
             <h3>{name}</h3>
-            {tasks.map((task) => (
-              <div className="card" key={task}>
-                {task}
-              </div>
-            ))}
+            {columns[name].length === 0 ? (
+              <p className="muted">—</p>
+            ) : (
+              columns[name].map((task) => (
+                <div className="card" key={task}>
+                  {task}
+                </div>
+              ))
+            )}
           </div>
         ))}
       </section>
     </div>
   );
 }
-

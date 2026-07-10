@@ -18,10 +18,20 @@ class ScoreResult:
     reasons: list[str]
 
 
-def _tokens(value: str | list[str] | None) -> set[str]:
+def _tokens(value: str | list | None) -> set[str]:
     if value is None:
         return set()
-    text = " ".join(value) if isinstance(value, list) else value
+    if isinstance(value, list):
+        parts: list[str] = []
+        for item in value:
+            if isinstance(item, dict):
+                # e.g. program entries like {"name": ..., "summary": ...}
+                parts.extend(str(v) for v in item.values())
+            else:
+                parts.append(str(item))
+        text = " ".join(parts)
+    else:
+        text = value
     cleaned = "".join(char.lower() if char.isalnum() else " " for char in text)
     return {part for part in cleaned.split() if len(part) > 2}
 

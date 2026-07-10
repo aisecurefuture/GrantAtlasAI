@@ -96,8 +96,14 @@ class ScoreOut(BaseModel):
     probability_of_success: float
     recommended_action: str
     reasons: list[str]
+    ai_narrative: str | None = None
 
     model_config = {"from_attributes": True}
+
+
+class OpportunityListItemOut(OpportunityOut):
+    fit_score: float | None = None
+    recommended_action: str | None = None
 
 
 class OpportunityDetailOut(BaseModel):
@@ -149,8 +155,14 @@ class ContractScoreOut(BaseModel):
     strategic_value: float
     recommended_action: str
     reasons: list[str]
+    ai_narrative: str | None = None
 
     model_config = {"from_attributes": True}
+
+
+class ContractListItemOut(ContractOpportunityOut):
+    fit_score: float | None = None
+    recommended_action: str | None = None
 
 
 class ContractDetailOut(BaseModel):
@@ -260,3 +272,29 @@ class LibraryItemOut(LibraryItemIn):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class BillingPlanOut(BaseModel):
+    id: str
+    name: str
+    price_monthly: int
+    price_annual: int
+    seats: str
+    blurb: str
+
+
+class BillingUsageOut(BaseModel):
+    users: int
+    saved_opportunities: int
+    proposal_workspaces: int
+
+
+class BillingSummaryOut(BaseModel):
+    plan: str
+    subscription_status: str
+    trial_end: datetime | None
+    stripe_configured: bool
+    stripe_customer_connected: bool
+    limits: dict[str, int | None]
+    usage: BillingUsageOut
+    available_plans: list[BillingPlanOut]

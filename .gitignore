@@ -15,3 +15,4 @@ uploads/
 postgres-data/
 redis-data/
 minio-data/
+*.tsbuildinfo

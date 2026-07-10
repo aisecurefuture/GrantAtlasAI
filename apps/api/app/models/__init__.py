@@ -163,6 +163,7 @@ class OpportunityScore(Base):
     probability_of_success: Mapped[float] = mapped_column(Float, nullable=False)
     recommended_action: Mapped[RecommendedAction] = mapped_column(Enum(RecommendedAction), nullable=False)
     reasons: Mapped[list] = mapped_column(JSON, default=list)
+    ai_narrative: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
@@ -214,6 +215,7 @@ class ContractScore(Base):
     strategic_value: Mapped[float] = mapped_column(Float, nullable=False)
     recommended_action: Mapped[ContractAction] = mapped_column(Enum(ContractAction), nullable=False)
     reasons: Mapped[list] = mapped_column(JSON, default=list)
+    ai_narrative: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 

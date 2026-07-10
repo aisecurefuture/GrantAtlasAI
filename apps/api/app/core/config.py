@@ -30,8 +30,11 @@ class Settings(BaseSettings):
     stripe_growth_price_id: str | None = None
     stripe_enterprise_price_id: str | None = None
     stripe_trial_days: int = 14
+    ai_provider: str = "anthropic"  # "anthropic" | "ollama"
     anthropic_api_key: str | None = None
     anthropic_model: str = "claude-opus-4-8"
+    ollama_base_url: str = "http://host.docker.internal:11434"
+    ollama_model: str = "gemma4:12b"
     resend_api_key: str | None = None
     email_from: str = "GrantAtlas <notifications@example.com>"
     bootstrap_admin_email: str = "owner@gratitech.org"

@@ -1,8 +1,8 @@
 "use client";
 
-import { Plus, Save, Trash2 } from "lucide-react";
+import { Plus, Save, Sparkles, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
-import { saveProposalAction, type ProposalSavePayload } from "@/app/actions/data";
+import { draftProposalSectionAction, saveProposalAction, type ProposalSavePayload } from "@/app/actions/data";
 import type { ProposalWorkspace } from "@/lib/types";
 
 const SECTION_STATUSES = ["Not started", "Drafting", "Review", "Complete"];
@@ -23,20 +23,43 @@ export function ProposalEditor({ proposal }: { proposal: ProposalWorkspace }) {
       status: r.status ?? "Unmapped",
     })),
   );
+  const [drafts, setDrafts] = useState<Record<string, string>>(
+    Object.fromEntries((proposal.narrative_sections ?? []).map((s) => [s.heading, s.content])),
+  );
   const [notes, setNotes] = useState(proposal.internal_notes ?? "");
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
+  const [draftingHeading, setDraftingHeading] = useState<string | null>(null);
 
   function save() {
     const payload: ProposalSavePayload = {
       title: title.trim() || proposal.title,
       outline: outline.filter((s) => s.heading.trim()),
       compliance_matrix: matrix.filter((r) => r.requirement.trim()),
+      narrative_sections: outline
+        .filter((s) => s.heading.trim() && drafts[s.heading]?.trim())
+        .map((s) => ({ heading: s.heading, content: drafts[s.heading] })),
       internal_notes: notes,
     };
     startTransition(async () => {
       const result = await saveProposalAction(proposal.id, payload);
       setMessage(result.ok ? { ok: true, text: result.message ?? "Saved." } : { ok: false, text: result.error ?? "Save failed." });
+    });
+  }
+
+  function draftSection(heading: string) {
+    if (!heading.trim() || draftingHeading) return;
+    setDraftingHeading(heading);
+    setMessage(null);
+    startTransition(async () => {
+      const result = await draftProposalSectionAction(proposal.id, heading, "");
+      if (result.ok && result.content !== undefined) {
+        setDrafts((prev) => ({ ...prev, [heading]: result.content as string }));
+        setMessage({ ok: true, text: `Drafted "${heading}". Review and edit before submitting.` });
+      } else {
+        setMessage({ ok: false, text: result.error ?? "Drafting failed." });
+      }
+      setDraftingHeading(null);
     });
   }
 
@@ -153,6 +176,51 @@ export function ProposalEditor({ proposal }: { proposal: ProposalWorkspace }) {
             Add requirement
           </button>
         </div>
+      </section>
+
+      <section className="card stack">
+        <div>
+          <h2>Narrative sections</h2>
+          <p className="muted" style={{ margin: "4px 0 0" }}>
+            AI drafts each section from your organization profile and content library, grounded in this funder&apos;s
+            priorities. It never invents facts — it inserts <code>[INSERT: …]</code> placeholders where you must add
+            specifics. Always review before submitting.
+          </p>
+        </div>
+        {outline.filter((s) => s.heading.trim()).length === 0 ? (
+          <p className="muted">Add outline sections above, then draft narrative content for each.</p>
+        ) : (
+          outline
+            .filter((s) => s.heading.trim())
+            .map((section) => (
+              <div className="stack narrative-section" key={section.heading} style={{ gap: 8 }}>
+                <div className="section-head" style={{ marginBottom: 0 }}>
+                  <h3>{section.heading}</h3>
+                  <button
+                    className="button secondary"
+                    type="button"
+                    onClick={() => draftSection(section.heading)}
+                    disabled={pending}
+                  >
+                    <Sparkles size={15} />
+                    {draftingHeading === section.heading
+                      ? "Drafting… (can take a minute)"
+                      : drafts[section.heading]
+                        ? "Redraft with AI"
+                        : "Draft with AI"}
+                  </button>
+                </div>
+                <textarea
+                  className="textarea"
+                  rows={drafts[section.heading] ? 10 : 4}
+                  value={drafts[section.heading] ?? ""}
+                  onChange={(e) => setDrafts((prev) => ({ ...prev, [section.heading]: e.target.value }))}
+                  placeholder="Draft with AI, or write this section directly…"
+                  aria-label={`${section.heading} narrative`}
+                />
+              </div>
+            ))
+        )}
       </section>
 
       <section className="card stack">

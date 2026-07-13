@@ -504,6 +504,19 @@ h3 {
   border-color: var(--blue);
 }
 
+.narrative-section + .narrative-section {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+  background: #eef2f8;
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+
 .plan-picker {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

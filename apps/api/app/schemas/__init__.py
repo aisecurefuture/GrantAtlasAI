@@ -299,6 +299,11 @@ class ProposalWorkspaceIn(BaseModel):
     internal_notes: str = ""
 
 
+class ProposalSectionDraftIn(BaseModel):
+    heading: str = Field(min_length=1, max_length=300)
+    guidance: str = ""
+
+
 class ProposalWorkspaceUpdateIn(BaseModel):
     title: str | None = None
     outline: list[Any] | None = None

@@ -387,6 +387,7 @@ export type ProposalSavePayload = {
   title?: string;
   outline?: Array<{ heading: string; status?: string }>;
   compliance_matrix?: Array<{ requirement: string; owner: string; status: string }>;
+  narrative_sections?: Array<{ heading: string; content: string }>;
   internal_notes?: string;
 };
 
@@ -399,6 +400,31 @@ export async function saveProposalAction(id: string, payload: ProposalSavePayloa
     return { ...OK, message: "Proposal saved." };
   } catch (error) {
     return fail(error);
+  }
+}
+
+export type DraftSectionResult = { ok: boolean; error: string | null; content?: string };
+
+export async function draftProposalSectionAction(
+  id: string,
+  heading: string,
+  guidance: string,
+): Promise<DraftSectionResult> {
+  if (!id || !heading.trim()) return { ok: false, error: "Add a section heading first." };
+  try {
+    const workspace = await apiSend<ProposalWorkspace>(`/proposals/${id}/draft-section`, "POST", {
+      heading,
+      guidance,
+    });
+    revalidatePath(`/proposals/${id}`);
+    const section = (workspace.narrative_sections ?? []).find((s) => s.heading === heading);
+    return { ...OK, content: section?.content ?? "" };
+  } catch (error) {
+    const f = fail(error);
+    if (error instanceof ApiError && error.status === 503) {
+      return { ok: false, error: "AI drafting isn't enabled on this environment yet." };
+    }
+    return { ok: false, error: f.error };
   }
 }
 

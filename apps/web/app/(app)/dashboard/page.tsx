@@ -3,7 +3,8 @@ import { Search, DownloadCloud } from "lucide-react";
 import { OpportunityTable } from "@/components/OpportunityTable";
 import { Disclosure } from "@/components/Disclosure";
 import { ActionForm } from "@/components/ActionForm";
-import { getOpportunities, getProposals } from "@/lib/api";
+import { OnboardingChecklist } from "@/components/OnboardingChecklist";
+import { getOnboardingStatus, getOpportunities, getProposals } from "@/lib/api";
 import { createOpportunityAction, ingestGrantsGovAction } from "@/app/actions/data";
 
 export const dynamic = "force-dynamic";
@@ -23,9 +24,10 @@ export default async function DashboardPage({
   const source = params.source ?? "";
   const status = params.status ?? "";
 
-  const [opportunities, proposals] = await Promise.all([
+  const [opportunities, proposals, onboarding] = await Promise.all([
     getOpportunities({ q, source, status }),
     getProposals().catch(() => []),
+    getOnboardingStatus().catch(() => null),
   ]);
 
   const scored = opportunities.filter((o) => typeof o.fit_score === "number");
@@ -38,6 +40,7 @@ export default async function DashboardPage({
 
   return (
     <>
+      {onboarding && !onboarding.dismissed ? <OnboardingChecklist status={onboarding} /> : null}
       <div className="topbar">
         <div>
           <p className="eyebrow">Funding intelligence</p>

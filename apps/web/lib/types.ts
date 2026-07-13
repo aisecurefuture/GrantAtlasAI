@@ -225,6 +225,24 @@ export type UsageSummary = {
   recent_audit_events: number;
 };
 
+export type OnboardingStep = {
+  key: string;
+  title: string;
+  description: string;
+  done: boolean;
+  cta_label: string;
+  cta_href: string;
+};
+
+export type OnboardingStatus = {
+  steps: OnboardingStep[];
+  completed: number;
+  total: number;
+  all_complete: boolean;
+  dismissed: boolean;
+  organization_name: string;
+};
+
 export type BillingSummary = {
   plan: string;
   subscription_status: string;

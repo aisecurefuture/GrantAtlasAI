@@ -342,6 +342,24 @@ class LibraryItemOut(LibraryItemIn):
     model_config = {"from_attributes": True}
 
 
+class OnboardingStepOut(BaseModel):
+    key: str
+    title: str
+    description: str
+    done: bool
+    cta_label: str
+    cta_href: str
+
+
+class OnboardingStatusOut(BaseModel):
+    steps: list[OnboardingStepOut]
+    completed: int
+    total: int
+    all_complete: bool
+    dismissed: bool
+    organization_name: str
+
+
 class BillingPlanOut(BaseModel):
     id: str
     name: str

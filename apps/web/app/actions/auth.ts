@@ -91,5 +91,5 @@ export async function registerAction(_prev: RegisterState, formData: FormData): 
   if (!data.access_token) return { error: "Registration failed. Please try again." };
 
   await setSessionCookie(data.access_token);
-  redirect("/organization");
+  redirect("/dashboard");
 }

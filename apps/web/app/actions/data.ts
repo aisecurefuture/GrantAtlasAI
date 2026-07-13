@@ -428,6 +428,18 @@ export async function draftProposalSectionAction(
   }
 }
 
+// ---------------- Onboarding ----------------
+
+export async function dismissOnboardingAction(): Promise<ActionState> {
+  try {
+    await apiSend("/onboarding/dismiss", "POST");
+    revalidatePath("/dashboard");
+    return OK;
+  } catch (error) {
+    return fail(error);
+  }
+}
+
 // ---------------- AI analysis ----------------
 
 export async function generateOpportunityNarrativeAction(_prev: ActionState, formData: FormData): Promise<ActionState> {

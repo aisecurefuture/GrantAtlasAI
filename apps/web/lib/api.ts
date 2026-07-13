@@ -124,6 +124,8 @@ export const getAdminTenants = () => apiRequest<TenantSummary[]>("/admin/tenants
 
 export const getAdminUsage = () => apiRequest<UsageSummary>("/admin/usage");
 
+export const getOnboardingStatus = () => apiRequest<import("./types").OnboardingStatus>("/onboarding/status");
+
 // ---- Writes (server actions) ----
 
 export const apiSend = <T>(path: string, method: string, body?: unknown, query?: FetchOptions["query"]) =>

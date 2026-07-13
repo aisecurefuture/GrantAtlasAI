@@ -68,6 +68,7 @@ class Tenant(Base):
     stripe_subscription_id: Mapped[str | None] = mapped_column(String(255))
     usage_limits: Mapped[dict] = mapped_column(JSON, default=dict)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    onboarding_dismissed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     users: Mapped[list["User"]] = relationship(back_populates="tenant", passive_deletes="all")

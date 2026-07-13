@@ -202,8 +202,18 @@ export type TenantSummary = {
   plan: string;
   subscription_status: string;
   trial_end: string | null;
+  is_active?: boolean;
   user_count?: number;
   opportunity_count?: number;
+};
+
+export type TenantUser = {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  is_active: boolean;
+  created_at: string;
 };
 
 export type UsageSummary = {

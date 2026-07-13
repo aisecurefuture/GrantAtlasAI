@@ -118,6 +118,8 @@ export const getProposal = (id: string) => apiRequest<ProposalWorkspace>(`/propo
 
 export const getBillingSummary = () => apiRequest<import("./types").BillingSummary>("/billing/summary");
 
+export const getTeamUsers = () => apiRequest<import("./types").TenantUser[]>("/organization/users");
+
 export const getAdminTenants = () => apiRequest<TenantSummary[]>("/admin/tenants");
 
 export const getAdminUsage = () => apiRequest<UsageSummary>("/admin/usage");

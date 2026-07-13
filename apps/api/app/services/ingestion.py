@@ -162,25 +162,27 @@ def upsert_sam_gov_items(db: Session, tenant_id: str, items: list[dict[str, Any]
     return imported
 
 
-def _tenant_query_terms(profile: OrganizationProfile | None) -> str:
+def _tenant_queries(profile: OrganizationProfile | None) -> list[str]:
+    """One broad query per focus area — concatenating terms over-narrows keyword search."""
     if not profile or not profile.focus_areas:
-        return ""
-    # Grants.gov keyword search works best with a small number of terms.
-    return " ".join(str(area) for area in profile.focus_areas[:3])
+        return [""]
+    return [str(area) for area in profile.focus_areas[:3]]
 
 
 async def ingest_grants_gov_for_all_tenants() -> dict:
     results: dict[str, int] = {}
     db = SessionLocal()
     try:
-        tenants = db.query(Tenant).all()
+        tenants = db.query(Tenant).filter(Tenant.is_active.is_(True)).all()
         for tenant in tenants:
             profile = db.query(OrganizationProfile).filter(OrganizationProfile.tenant_id == tenant.id).first()
-            query = _tenant_query_terms(profile)
+            imported = 0
             try:
-                items = await search_grants_gov(query)
-                results[tenant.slug] = upsert_grants_gov_items(db, tenant.id, items)
+                for query in _tenant_queries(profile):
+                    items = await search_grants_gov(query)
+                    imported += upsert_grants_gov_items(db, tenant.id, items)
                 db.commit()
+                results[tenant.slug] = imported
             except Exception:
                 db.rollback()
                 logger.exception("Grants.gov ingestion failed for tenant %s", tenant.slug)
@@ -197,14 +199,16 @@ async def ingest_sam_gov_for_all_tenants() -> dict:
     results: dict[str, int] = {}
     db = SessionLocal()
     try:
-        tenants = db.query(Tenant).all()
+        tenants = db.query(Tenant).filter(Tenant.is_active.is_(True)).all()
         for tenant in tenants:
             profile = db.query(OrganizationProfile).filter(OrganizationProfile.tenant_id == tenant.id).first()
-            query = _tenant_query_terms(profile)
+            imported = 0
             try:
-                items = await search_sam_gov(query=query)
-                results[tenant.slug] = upsert_sam_gov_items(db, tenant.id, items)
+                for query in _tenant_queries(profile):
+                    items = await search_sam_gov(query=query)
+                    imported += upsert_sam_gov_items(db, tenant.id, items)
                 db.commit()
+                results[tenant.slug] = imported
             except Exception:
                 db.rollback()
                 logger.exception("SAM.gov ingestion failed for tenant %s", tenant.slug)

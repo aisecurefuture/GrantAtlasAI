@@ -78,7 +78,7 @@ def run() -> None:
                     title="Community Technology Education Capacity Grant",
                     agency="Manual Seed Funder",
                     source="Manual",
-                    source_url="https://example.org/grants/community-tech",
+                    source_url=None,  # manual entries have no external listing
                     opportunity_number="SEED-TECH-001",
                     posted_date=datetime.now(timezone.utc),
                     close_date=datetime.now(timezone.utc) + timedelta(days=35),

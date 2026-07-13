@@ -23,7 +23,7 @@ export default function Home() {
       description: "For small nonprofits getting grant discovery and deadlines under control.",
       details: "2 users, Grants.gov and SAM.gov discovery, fit scoring, pipeline tracking",
       cta: "Start trial",
-      href: `${appUrl}/login`,
+      href: `${appUrl}/register?plan=Starter`,
     },
     {
       plan: "Professional",
@@ -33,7 +33,7 @@ export default function Home() {
       description: "For active grant teams managing proposals, reviews, and reusable content.",
       details: "5 users, proposal workspaces, content library, capture plans, team collaboration",
       cta: "Start trial",
-      href: `${appUrl}/login`,
+      href: `${appUrl}/register?plan=Professional`,
       featured: true,
     },
     {
@@ -44,7 +44,7 @@ export default function Home() {
       description: "For larger teams pursuing grants and government contracts together.",
       details: "15 users, partner CRM, past performance records, advanced reporting, priority support",
       cta: "Start trial",
-      href: `${appUrl}/login`,
+      href: `${appUrl}/register?plan=Growth`,
     },
     {
       plan: "Enterprise",
@@ -86,7 +86,7 @@ export default function Home() {
             GrantAtlas helps nonprofits, universities, researchers, and growth-stage contractors discover funding, explain fit, manage deadlines, and build proposal workspaces from one secure platform.
           </p>
           <div className="hero-actions">
-            <a className="button" href={`${appUrl}/login`}>
+            <a className="button" href={`${appUrl}/register`}>
               Start 14-day trial
               <ArrowRight size={18} />
             </a>

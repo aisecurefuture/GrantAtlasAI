@@ -106,7 +106,7 @@ export default async function OpportunityPage({ params }: { params: Promise<{ id
             <strong>Eligibility:</strong> {opportunity.eligibility || "Not specified."}
           </p>
           {opportunity.description ? <p className="muted">{opportunity.description}</p> : null}
-          {opportunity.source_url ? (
+          {opportunity.source_url && !/https?:\/\/(www\.)?example\.(org|com|net)/.test(opportunity.source_url) ? (
             <a className="button secondary" href={opportunity.source_url} target="_blank" rel="noreferrer">
               View source listing
             </a>

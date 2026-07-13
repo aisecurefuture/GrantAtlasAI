@@ -504,6 +504,82 @@ h3 {
   border-color: var(--blue);
 }
 
+.plan-picker {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.plan-option {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.plan-option[data-selected="true"] {
+  border-color: var(--blue);
+  background: #f2f7ff;
+}
+
+.plan-price {
+  font-weight: 800;
+}
+
+.plan-blurb {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.row-form .form-footer {
+  gap: 6px;
+}
+
+.row-form .form-footer .button {
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.danger-zone {
+  border-left: 4px solid var(--red);
+}
+
+.editor-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 130px 40px;
+  gap: 8px;
+  align-items: center;
+}
+
+.editor-row.compliance {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr) 120px 40px;
+}
+
+.icon-button {
+  min-height: 36px;
+  padding: 0 8px;
+}
+
+.title-input {
+  font-size: 24px;
+  font-weight: 800;
+  width: 100%;
+}
+
+@media (max-width: 700px) {
+  .plan-picker,
+  .editor-row,
+  .editor-row.compliance {
+    grid-template-columns: 1fr;
+  }
+}
+
 .skeleton,
 .skeleton-card,
 .skeleton-block {

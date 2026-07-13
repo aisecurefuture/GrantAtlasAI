@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Search, DownloadCloud } from "lucide-react";
 import { OpportunityTable } from "@/components/OpportunityTable";
 import { Disclosure } from "@/components/Disclosure";
@@ -45,11 +46,18 @@ export default async function DashboardPage({
         <div className="toolbar">
           <Disclosure label="Import Grants.gov" variant="secondary">
             <h3>Import from Grants.gov</h3>
-            <p className="muted">Pulls live opportunities and scores each one against your organization profile.</p>
-            <ActionForm action={ingestGrantsGovAction} submitLabel="Import & score">
+            <p className="muted">
+              Pulls live opportunities and scores each one against your organization profile. Use a single broad
+              keyword — leaving it empty searches all recently posted grants.
+            </p>
+            <ActionForm
+              action={ingestGrantsGovAction}
+              submitLabel="Import & score"
+              pendingLabel="Importing from Grants.gov… (can take up to a minute)"
+            >
               <label className="field">
                 <span className="field-label">Keyword (optional)</span>
-                <input className="input" name="query" placeholder="e.g. cybersecurity education" />
+                <input className="input" name="query" placeholder="e.g. cybersecurity" />
               </label>
             </ActionForm>
           </Disclosure>
@@ -117,7 +125,13 @@ export default async function DashboardPage({
       </section>
 
       <div className="section-head" style={{ marginTop: 28 }}>
-        <h2>Opportunity search</h2>
+        <div>
+          <h2>Grant opportunities</h2>
+          <p className="muted" style={{ margin: "4px 0 0" }}>
+            Grants.gov and manual entries. Looking for federal contracts?{" "}
+            <Link href="/contracts">SAM.gov contract opportunities →</Link>
+          </p>
+        </div>
         <form className="toolbar" method="get">
           <div className="input toolbar" style={{ padding: "0 12px" }}>
             <Search size={16} />

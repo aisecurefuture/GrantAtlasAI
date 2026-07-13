@@ -1,16 +1,39 @@
 import { ActionForm } from "@/components/ActionForm";
-import { getOrganizationProfile } from "@/lib/api";
-import { saveOrganizationAction } from "@/app/actions/data";
-import type { OrganizationProfile } from "@/lib/types";
+import { Disclosure } from "@/components/Disclosure";
+import { getOrganizationProfile, getTeamUsers } from "@/lib/api";
+import {
+  createTeamUserAction,
+  deactivateAccountAction,
+  deleteAccountAction,
+  saveOrganizationAction,
+  updateTeamUserAction,
+} from "@/app/actions/data";
+import { getSession } from "@/lib/session";
+import type { OrganizationProfile, TenantUser } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
+const ROLES = ["Owner", "Admin", "Grant Writer", "Reviewer", "Viewer"];
+
 export default async function OrganizationPage() {
+  const session = await getSession();
+  const canManage = session ? ["Owner", "Admin"].includes(session.claims.role) || session.claims.is_super_admin : false;
+  const isOwner = session ? session.claims.role === "Owner" || session.claims.is_super_admin : false;
+
   let profile: OrganizationProfile | null = null;
   try {
     profile = await getOrganizationProfile();
   } catch {
     profile = null;
+  }
+
+  let team: TenantUser[] = [];
+  if (canManage) {
+    try {
+      team = await getTeamUsers();
+    } catch {
+      team = [];
+    }
   }
 
   return (
@@ -97,6 +120,126 @@ export default async function OrganizationPage() {
           </label>
         </section>
       </ActionForm>
+
+      {canManage ? (
+        <section className="card stack">
+          <div className="section-head" style={{ marginBottom: 0 }}>
+            <h2>Team</h2>
+            <Disclosure label="Add user">
+              <h3>Add a team member</h3>
+              <p className="muted">
+                A temporary password is generated and shown once — share it securely and have them change it later.
+              </p>
+              <ActionForm action={createTeamUserAction} submitLabel="Add user">
+                <div className="grid cols-2">
+                  <label className="field">
+                    <span className="field-label">Name *</span>
+                    <input className="input" name="name" required />
+                  </label>
+                  <label className="field">
+                    <span className="field-label">Email *</span>
+                    <input className="input" type="email" name="email" required />
+                  </label>
+                </div>
+                <label className="field">
+                  <span className="field-label">Role</span>
+                  <select className="select" name="role" defaultValue="Viewer">
+                    {ROLES.map((r) => (
+                      <option key={r}>{r}</option>
+                    ))}
+                  </select>
+                </label>
+              </ActionForm>
+            </Disclosure>
+          </div>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {team.map((member) => (
+                <tr key={member.id}>
+                  <td>
+                    <strong>{member.name}</strong>
+                    <div className="muted">{member.email}</div>
+                  </td>
+                  <td>
+                    <ActionForm
+                      action={updateTeamUserAction}
+                      submitLabel="Update"
+                      hidden={{ user_id: member.id }}
+                      resetOnSuccess={false}
+                      className="row-form"
+                    >
+                      <select className="select" name="role" defaultValue={member.role}>
+                        {ROLES.map((r) => (
+                          <option key={r}>{r}</option>
+                        ))}
+                      </select>
+                    </ActionForm>
+                  </td>
+                  <td>
+                    <span className={`pill ${member.is_active ? "high" : "low"}`}>
+                      {member.is_active ? "Active" : "Deactivated"}
+                    </span>
+                  </td>
+                  <td>
+                    <ActionForm
+                      action={updateTeamUserAction}
+                      submitLabel={member.is_active ? "Deactivate" : "Reactivate"}
+                      hidden={{ user_id: member.id, is_active: member.is_active ? "false" : "true" }}
+                      resetOnSuccess={false}
+                      className="row-form"
+                    >
+                      <span />
+                    </ActionForm>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      ) : null}
+
+      {isOwner ? (
+        <section className="card stack danger-zone">
+          <h2>Danger zone</h2>
+          <p className="muted">
+            Deactivating blocks all sign-ins but keeps your data — contact support to reactivate. Deleting permanently
+            removes your organization and every record it owns. Neither can be undone by your team.
+          </p>
+          <div className="toolbar">
+            <Disclosure label="Deactivate account" variant="secondary">
+              <h3>Deactivate this organization</h3>
+              <p className="muted">All users will be signed out and unable to log in. Data is retained.</p>
+              <ActionForm action={deactivateAccountAction} submitLabel="Deactivate organization">
+                <label className="field">
+                  <span className="field-label">Type DEACTIVATE to confirm</span>
+                  <input className="input" name="confirm" placeholder="DEACTIVATE" required />
+                </label>
+              </ActionForm>
+            </Disclosure>
+            <Disclosure label="Delete account" variant="secondary">
+              <h3>Permanently delete this organization</h3>
+              <p className="muted">
+                Removes all opportunities, contracts, proposals, library content, partners, and users. This cannot be
+                undone.
+              </p>
+              <ActionForm action={deleteAccountAction} submitLabel="Delete everything permanently">
+                <label className="field">
+                  <span className="field-label">Type your organization name ({profile?.organization_name ?? "…"}) to confirm</span>
+                  <input className="input" name="confirm_organization_name" required />
+                </label>
+              </ActionForm>
+            </Disclosure>
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

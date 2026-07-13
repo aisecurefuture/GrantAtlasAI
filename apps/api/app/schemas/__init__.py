@@ -26,6 +26,58 @@ class UserOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class RegisterIn(BaseModel):
+    organization_name: str = Field(min_length=2, max_length=255)
+    name: str = Field(min_length=1, max_length=255)
+    email: EmailStr
+    password: str = Field(min_length=10, max_length=128)
+    plan: str
+
+
+class TenantUserOut(BaseModel):
+    id: str
+    email: EmailStr
+    name: str
+    role: str
+    is_active: bool
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class TenantUserCreateIn(BaseModel):
+    email: EmailStr
+    name: str = Field(min_length=1, max_length=255)
+    role: str = "Viewer"
+
+
+class TenantUserCreateOut(BaseModel):
+    user: TenantUserOut
+    temporary_password: str
+
+
+class TenantUserUpdateIn(BaseModel):
+    role: str | None = None
+    is_active: bool | None = None
+
+
+class AccountDeleteIn(BaseModel):
+    confirm_organization_name: str
+
+
+class AdminTenantCreateIn(BaseModel):
+    organization_name: str = Field(min_length=2, max_length=255)
+    owner_name: str = Field(min_length=1, max_length=255)
+    owner_email: EmailStr
+    plan: str = "Free Trial"
+
+
+class AdminTenantCreateOut(BaseModel):
+    tenant_id: str
+    owner: TenantUserOut
+    temporary_password: str
+
+
 class OrganizationProfileIn(BaseModel):
     organization_name: str
     ein: str | None = None
@@ -245,6 +297,17 @@ class ProposalWorkspaceIn(BaseModel):
     budget: dict[str, Any] = Field(default_factory=dict)
     narrative_sections: list[Any] = Field(default_factory=list)
     internal_notes: str = ""
+
+
+class ProposalWorkspaceUpdateIn(BaseModel):
+    title: str | None = None
+    outline: list[Any] | None = None
+    compliance_matrix: list[Any] | None = None
+    required_attachments: list[Any] | None = None
+    tasks: list[Any] | None = None
+    budget: dict[str, Any] | None = None
+    narrative_sections: list[Any] | None = None
+    internal_notes: str | None = None
 
 
 class ProposalWorkspaceOut(ProposalWorkspaceIn):

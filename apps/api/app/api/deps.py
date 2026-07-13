@@ -21,6 +21,8 @@ def current_user(
     user = db.get(User, payload["sub"])
     if not user or not user.is_active:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Inactive or missing user")
+    if not user.tenant.is_active and not user.is_super_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This organization's account is deactivated")
     return user
 
 

@@ -9,6 +9,7 @@ const initial: ActionState = { ok: false, error: null };
 export function ActionForm({
   action,
   submitLabel,
+  pendingLabel,
   children,
   resetOnSuccess = true,
   hidden,
@@ -16,6 +17,7 @@ export function ActionForm({
 }: {
   action: (prev: ActionState, formData: FormData) => Promise<ActionState>;
   submitLabel: string;
+  pendingLabel?: string;
   children: ReactNode;
   resetOnSuccess?: boolean;
   hidden?: Record<string, string>;
@@ -36,7 +38,7 @@ export function ActionForm({
       {children}
       <div className="form-footer">
         <button className="button" type="submit" disabled={pending}>
-          {pending ? "Saving…" : submitLabel}
+          {pending ? (pendingLabel ?? "Saving…") : submitLabel}
         </button>
         {state.error ? (
           <span className="form-error" role="alert">

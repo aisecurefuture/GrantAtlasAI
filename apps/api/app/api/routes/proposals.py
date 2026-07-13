@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import current_user, require_role
 from app.db.session import get_db
 from app.models import Opportunity, ProposalWorkspace, Role, User
-from app.schemas import ProposalWorkspaceIn, ProposalWorkspaceOut
+from app.schemas import ProposalWorkspaceIn, ProposalWorkspaceOut, ProposalWorkspaceUpdateIn
 
 router = APIRouter()
 
@@ -35,5 +35,22 @@ def get_workspace(workspace_id: str, user: User = Depends(current_user), db: Ses
     workspace = db.query(ProposalWorkspace).filter(ProposalWorkspace.id == workspace_id, ProposalWorkspace.tenant_id == user.tenant_id).first()
     if not workspace:
         raise HTTPException(status_code=404, detail="Proposal workspace not found")
+    return workspace
+
+
+@router.put("/{workspace_id}", response_model=ProposalWorkspaceOut)
+def update_workspace(
+    workspace_id: str,
+    payload: ProposalWorkspaceUpdateIn,
+    user: User = Depends(require_role(Role.OWNER, Role.ADMIN, Role.GRANT_WRITER)),
+    db: Session = Depends(get_db),
+) -> ProposalWorkspace:
+    workspace = db.query(ProposalWorkspace).filter(ProposalWorkspace.id == workspace_id, ProposalWorkspace.tenant_id == user.tenant_id).first()
+    if not workspace:
+        raise HTTPException(status_code=404, detail="Proposal workspace not found")
+    for key, value in payload.model_dump(exclude_unset=True).items():
+        setattr(workspace, key, value)
+    db.commit()
+    db.refresh(workspace)
     return workspace
 

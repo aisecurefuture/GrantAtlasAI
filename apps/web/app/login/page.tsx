@@ -14,6 +14,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <p className="muted">The map to federal funding — grants and contracts in one workspace.</p>
         </div>
         <LoginForm next={next} />
+        <p className="muted">
+          New to GrantAtlas? <a href="/register">Start a free trial</a>
+        </p>
       </div>
     </main>
   );

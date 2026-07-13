@@ -64,7 +64,15 @@ export async function ingestGrantsGovAction(_prev: ActionState, formData: FormDa
   try {
     const imported = await apiSend<Opportunity[]>("/opportunities/ingest/grants-gov", "POST", undefined, { query });
     revalidatePath("/dashboard");
-    return { ...OK, message: `Imported ${imported.length} opportunit${imported.length === 1 ? "y" : "ies"} from Grants.gov.` };
+    if (imported.length === 0) {
+      return {
+        ...OK,
+        message: query
+          ? `No Grants.gov matches for "${query}". Try one broader keyword (e.g. "cybersecurity" or "education").`
+          : "No new Grants.gov opportunities found right now.",
+      };
+    }
+    return { ...OK, message: `Imported and scored ${imported.length} opportunit${imported.length === 1 ? "y" : "ies"} from Grants.gov.` };
   } catch (error) {
     return fail(error);
   }
@@ -249,6 +257,149 @@ export async function createProposalAction(_prev: ActionState, formData: FormDat
   }
   revalidatePath("/proposals");
   redirect(`/proposals/${created.id}`);
+}
+
+// ---------------- Team management ----------------
+
+export async function createTeamUserAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const email = str(formData, "email");
+  const name = str(formData, "name");
+  if (!email || !name) return { ok: false, error: "Name and email are required." };
+  try {
+    const result = await apiSend<{ temporary_password: string }>("/organization/users", "POST", {
+      email,
+      name,
+      role: str(formData, "role") || "Viewer",
+    });
+    revalidatePath("/organization");
+    return {
+      ...OK,
+      message: `User added. Temporary password (shown once — share it securely): ${result.temporary_password}`,
+    };
+  } catch (error) {
+    return fail(error);
+  }
+}
+
+export async function updateTeamUserAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const userId = str(formData, "user_id");
+  if (!userId) return { ok: false, error: "Missing user reference." };
+  const body: Record<string, unknown> = {};
+  const role = str(formData, "role");
+  const isActive = str(formData, "is_active");
+  if (role) body.role = role;
+  if (isActive) body.is_active = isActive === "true";
+  try {
+    await apiSend(`/organization/users/${userId}`, "PATCH", body);
+    revalidatePath("/organization");
+    return { ...OK, message: "User updated." };
+  } catch (error) {
+    return fail(error);
+  }
+}
+
+// ---------------- Account lifecycle ----------------
+
+export async function deactivateAccountAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  if (str(formData, "confirm") !== "DEACTIVATE") {
+    return { ok: false, error: 'Type "DEACTIVATE" to confirm.' };
+  }
+  try {
+    await apiSend("/organization/deactivate", "POST");
+  } catch (error) {
+    return fail(error);
+  }
+  const { clearSessionCookie } = await import("@/lib/session");
+  await clearSessionCookie();
+  redirect("/login");
+}
+
+export async function deleteAccountAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const confirmName = str(formData, "confirm_organization_name");
+  if (!confirmName) return { ok: false, error: "Type your organization name to confirm." };
+  try {
+    await apiSend("/organization/delete", "POST", { confirm_organization_name: confirmName });
+  } catch (error) {
+    return fail(error);
+  }
+  const { clearSessionCookie } = await import("@/lib/session");
+  await clearSessionCookie();
+  redirect("/login");
+}
+
+// ---------------- Super-admin tenant management ----------------
+
+export async function adminCreateTenantAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const organization_name = str(formData, "organization_name");
+  const owner_name = str(formData, "owner_name");
+  const owner_email = str(formData, "owner_email");
+  if (!organization_name || !owner_name || !owner_email) {
+    return { ok: false, error: "Organization, owner name, and owner email are required." };
+  }
+  try {
+    const result = await apiSend<{ temporary_password: string }>("/admin/tenants", "POST", {
+      organization_name,
+      owner_name,
+      owner_email,
+      plan: str(formData, "plan") || "Free Trial",
+    });
+    revalidatePath("/admin");
+    return {
+      ...OK,
+      message: `Tenant created. Owner temporary password (shown once): ${result.temporary_password}`,
+    };
+  } catch (error) {
+    return fail(error);
+  }
+}
+
+export async function adminSetTenantActiveAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const tenantId = str(formData, "tenant_id");
+  const activate = str(formData, "activate") === "true";
+  if (!tenantId) return { ok: false, error: "Missing tenant reference." };
+  try {
+    await apiSend(`/admin/tenants/${tenantId}/${activate ? "activate" : "deactivate"}`, "POST");
+    revalidatePath("/admin");
+    return { ...OK, message: activate ? "Tenant reactivated." : "Tenant deactivated — logins are now blocked." };
+  } catch (error) {
+    return fail(error);
+  }
+}
+
+export async function adminDeleteTenantAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const tenantId = str(formData, "tenant_id");
+  if (!tenantId) return { ok: false, error: "Missing tenant reference." };
+  if (str(formData, "confirm") !== "DELETE") {
+    return { ok: false, error: 'Type "DELETE" to confirm permanent removal.' };
+  }
+  try {
+    await apiSend(`/admin/tenants/${tenantId}`, "DELETE");
+    revalidatePath("/admin");
+    return { ...OK, message: "Tenant and all of its data permanently deleted." };
+  } catch (error) {
+    return fail(error);
+  }
+}
+
+// ---------------- Proposal editing ----------------
+
+export type ProposalSavePayload = {
+  title?: string;
+  outline?: Array<{ heading: string; status?: string }>;
+  compliance_matrix?: Array<{ requirement: string; owner: string; status: string }>;
+  internal_notes?: string;
+};
+
+export async function saveProposalAction(id: string, payload: ProposalSavePayload): Promise<ActionState> {
+  if (!id) return { ok: false, error: "Missing proposal reference." };
+  try {
+    await apiSend(`/proposals/${id}`, "PUT", payload);
+    revalidatePath(`/proposals/${id}`);
+    revalidatePath("/proposals");
+    return { ...OK, message: "Proposal saved." };
+  } catch (error) {
+    return fail(error);
+  }
 }
 
 // ---------------- AI analysis ----------------

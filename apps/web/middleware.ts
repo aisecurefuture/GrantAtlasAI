@@ -50,7 +50,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (pathname === "/login" && isValid) {
+  if ((pathname === "/login" || pathname === "/register") && isValid) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
@@ -62,6 +62,7 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/login",
+    "/register",
     "/dashboard/:path*",
     "/opportunities/:path*",
     "/contracts/:path*",

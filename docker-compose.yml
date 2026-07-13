@@ -40,6 +40,9 @@ services:
       context: ./apps/api
     env_file:
       - ${COMPOSE_ENV_FILE:-.env}
+    # Lets containers reach a host-side Ollama on Linux (no-op on Docker Desktop)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       db:
         condition: service_healthy
@@ -56,6 +59,8 @@ services:
       context: ./apps/api
     env_file:
       - ${COMPOSE_ENV_FILE:-.env}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - api
       - redis
